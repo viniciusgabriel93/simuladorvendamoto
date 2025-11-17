@@ -1,178 +1,409 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulador de Vendas - Moto</title>
-
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Calculadora de Venda de Motos — Exclusive</title>
 <style>
-    body {
-        background: #1c1c1c;
-        color: #fff;
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 20px;
-    }
+  :root{
+    --bg:#0e0f11;
+    --card:#121315;
+    --muted:#9aa0a6;
+    --accent:#f08c00;
+    --accent-2:#ffb04d;
+    --white:#ffffff;
+    --glass: rgba(255,255,255,0.03);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:linear-gradient(180deg, #0b0c0d 0%, #0f1112 100%);
+    color:var(--white);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px;
+  }
 
-    .container {
-        max-width: 550px;
-        margin: auto;
-        background: #2a2a2a;
-        padding: 20px;
-        border-radius: 12px;
-    }
+  .wrap{
+    width:100%;
+    max-width:1100px;
+    display:grid;
+    grid-template-columns: 420px 1fr;
+    gap:22px;
+  }
 
-    img {
-        width: 160px;
-        display: block;
-        margin: 0 auto 20px;
-    }
+  .panel{
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:16px;
+    padding:20px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+    border:1px solid rgba(255,255,255,0.03);
+  }
 
-    label {
-        font-size: 15px;
-        font-weight: bold;
-        display: block;
-        margin-top: 12px;
-    }
+  .brand{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin-bottom:10px;
+  }
+  .brand img{ width:64px; height:64px; object-fit:contain; border-radius:8px; background:transparent; }
+  .brand h1{ font-size:20px; margin:0; letter-spacing:0.6px;}
+  .brand p{ margin:0; color:var(--muted); font-size:12px }
 
-    input, select {
-        width: 100%;
-        padding: 12px;
-        border: none;
-        border-radius: 8px;
-        margin-top: 5px;
-        background: #3a3a3a;
-        color: white;
-        font-size: 16px;
-    }
+  label{ display:block; font-size:13px; margin-bottom:6px; color:var(--muted) }
+  input[type="text"], input[type="number"], select {
+    width:100%;
+    padding:10px 12px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,0.04);
+    background:var(--glass);
+    color:var(--white);
+    outline:none;
+    font-size:14px;
+    margin-bottom:12px;
+  }
+  .row{ display:flex; gap:12px; }
+  .col{ flex:1 }
+  .small{ width:120px }
+  .checkbox{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:13px;
+    margin-bottom:12px;
+  }
 
-    button {
-        width: 100%;
-        padding: 14px;
-        background: #ff6b00;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-size: 18px;
-        margin-top: 20px;
-        cursor: pointer;
-        font-weight: bold;
-    }
+  .muted{ color:var(--muted); font-size:13px }
 
-    button:hover {
-        opacity: 0.9;
-    }
+  .actions{
+    display:flex;
+    gap:10px;
+    margin-top:6px;
+  }
 
-    .checkbox {
-        margin-top: 15px;
-    }
+  button{
+    cursor:pointer;
+    border:0;
+    padding:10px 14px;
+    border-radius:10px;
+    font-weight:600;
+    font-size:14px;
+  }
+  .btn-primary{
+    background: linear-gradient(90deg,var(--accent),var(--accent-2));
+    color:#111;
+    box-shadow: 0 6px 18px rgba(240,140,0,0.15);
+  }
+  .btn-ghost{
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.04);
+    color:var(--white);
+  }
 
+  .results{
+    padding:18px;
+    border-radius:12px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));
+    border:1px solid rgba(255,255,255,0.03);
+  }
+  .results h2{ margin:0 0 8px 0; font-size:18px }
+  .result-card{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px;
+    border-radius:10px;
+    background: rgba(0,0,0,0.25);
+    margin-bottom:10px;
+  }
+  .result-card small{ color:var(--muted) }
+  .big{ font-size:18px; font-weight:700 }
+
+  .whatsapp{
+    margin-top:12px;
+    display:flex;
+    gap:8px;
+    align-items:center;
+  }
+
+  textarea{
+    width:100%;
+    min-height:120px;
+    padding:10px;
+    border-radius:8px;
+    border:1px solid rgba(255,255,255,0.04);
+    background:transparent;
+    color:var(--white);
+    resize:vertical;
+  }
+
+  .footer-note{ color:var(--muted); font-size:12px; margin-top:8px }
+
+  @media (max-width:980px){
+    .wrap{ grid-template-columns: 1fr; }
+    .brand img{ width:56px; height:56px }
+  }
 </style>
 </head>
 <body>
+  <div class="wrap">
 
-<div class="container">
+    <!-- LEFT -->
+    <div class="panel">
+      <div class="brand">
+        <img src="LOGO.PNG" alt="Logo">
+        <div>
+          <h1>Exclusive — Simulador de Venda</h1>
+          <p>Aluguel / Venda — calcule opções de parcelamento</p>
+        </div>
+      </div>
 
-    <img src="LOGO.PNG" alt="Logo">
+      <form id="simForm" onsubmit="return false;">
+        
+        <label for="fipe">Valor da moto (tabela FIPE)</label>
+        <input id="fipe" type="number" min="0" step="0.01" placeholder="Ex.: 10000" required
+               inputmode="numeric" pattern="[0-9]*">
 
-    <label>Valor FIPE:</label>
-    <input type="number" inputmode="numeric" pattern="\d*" id="fipe">
+        <div class="row">
+          <div class="col">
+            <label for="marca">Marca</label>
+            <input id="marca" type="text" placeholder="Ex.: Honda" required>
+          </div>
+          <div class="col">
+            <label for="modelo">Modelo</label>
+            <input id="modelo" type="text" placeholder="Ex.: CB 500" required>
+          </div>
+        </div>
 
-    <label>Ano:</label>
-    <input type="number" inputmode="numeric" pattern="\d*" id="ano">
+        <div class="row">
+          <div class="col">
+            <label for="ano">Ano</label>
+            <input id="ano" type="text" placeholder="Ex.: 2018" required
+                   inputmode="numeric" pattern="[0-9]*">
+          </div>
+          <div class="col">
+            <label for="km">Quilometragem (km)</label>
+            <input id="km" type="text" placeholder="Ex.: 45000"
+                   inputmode="numeric" pattern="[0-9]*">
+          </div>
+        </div>
 
-    <label>Marca:</label>
-    <input type="text" id="marca">
+        <label for="taxa">Taxa (juros) — informe apenas o número (ex.: 100 = 100%)</label>
+        <input id="taxa" type="number" min="0" step="0.01" placeholder="Ex.: 10 ou 100" required
+               inputmode="numeric" pattern="[0-9]*">
 
-    <label>Modelo:</label>
-    <input type="text" id="modelo">
+        <div class="checkbox">
+          <input id="porAno" type="checkbox">
+          <label for="porAno" style="margin:0">Aplicar taxa <strong>por ano</strong></label>
+        </div>
 
-    <label>Quilometragem:</label>
-    <input type="number" inputmode="numeric" pattern="\d*" id="km">
+        <label for="financiamento">Valor do financiamento (preenchido automaticamente)</label>
+        <input id="financiamento" type="text" readonly placeholder="Preencha FIPE e taxa para calcular">
 
-    <label>Taxa (%):</label>
-    <input type="number" inputmode="numeric" pattern="\d*" id="taxa">
+        <div class="actions">
+          <button id="calcularBtn" class="btn-primary" type="button">Calcular</button>
+          <button id="limparBtn" class="btn-ghost" type="button">Limpar</button>
+        </div>
 
-    <div class="checkbox">
-        <input type="checkbox" id="usarAnos">
-        <label for="usarAnos">Aplicar taxa por ano</label>
+        <p class="footer-note">Observação: a taxa deve ser informada como número.</p>
+      </form>
     </div>
 
-    <label>Valor do financiamento:</label>
-    <input type="number" inputmode="numeric" pattern="\d*" id="financiamento" readonly>
+    <!-- RIGHT -->
+    <div class="panel results">
+      <h2>Resultado da Simulação</h2>
 
-    <button onclick="calcular()">Calcular</button>
+      <div id="summaryArea" style="margin-bottom:12px">
+        <div class="result-card">
+          <div>
+            <small>Marca / Modelo / Ano</small>
+            <div id="summaryTitle" class="big">—</div>
+          </div>
+          <div style="text-align:right">
+            <small>Valor FIPE</small>
+            <div id="summaryFipe" class="big">R$ 0,00</div>
+          </div>
+        </div>
+        <div class="muted" id="appliedNote">Nenhuma simulação realizada ainda.</div>
+      </div>
 
-    <label>Enviar para WhatsApp:</label>
-    <input type="text" id="whats" placeholder="DDD + Número">
+      <div id="optionsContainer"></div>
 
-    <button onclick="enviarWhats()">Enviar WhatsApp</button>
+      <div style="margin-top:8px">
+        <label for="whatsappNumber">Número do WhatsApp (com DDI)</label>
+        <input id="whatsappNumber" type="text" placeholder="Ex.: 5511999998888" 
+               inputmode="numeric" pattern="[0-9]*">
 
-</div>
+        <label style="margin-top:8px">Mensagem (pré-visualização)</label>
+        <textarea id="whatsappMessage" readonly></textarea>
+
+        <div class="whatsapp">
+          <button id="openWhatsapp" class="btn-primary">Abrir no WhatsApp</button>
+          <button id="copyMsg" class="btn-ghost">Copiar Mensagem</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
 
 <script>
-function calcular() {
-    let fipe = Number(document.getElementById("fipe").value);
-    let taxa = Number(document.getElementById("taxa").value) / 100;
-    let usarAnos = document.getElementById("usarAnos").checked;
+  // Utils
+  const fmtBRL = v => {
+    if (isNaN(v) || v === null) v = 0;
+    return new Intl.NumberFormat('pt-BR', { style:'currency', currency:'BRL' }).format(v);
+  };
+  const el = id => document.getElementById(id);
 
-    if (!fipe || taxa < 0) {
-        alert("Preencha FIPE e taxa corretamente.");
-        return;
+  // Elements
+  const fipeInput = el('fipe');
+  const taxaInput = el('taxa');
+  const financiamentoInput = el('financiamento');
+  const calcularBtn = el('calcularBtn');
+  const limparBtn = el('limparBtn');
+  const porAnoCheckbox = el('porAno');
+  const summaryTitle = el('summaryTitle');
+  const summaryFipe = el('summaryFipe');
+  const appliedNote = el('appliedNote');
+  const optionsContainer = el('optionsContainer');
+  const marcaInput = el('marca');
+  const modeloInput = el('modelo');
+  const anoInput = el('ano');
+  const kmInput = el('km');
+  const whatsappNumber = el('whatsappNumber');
+  const whatsappMessage = el('whatsappMessage');
+  const openWhatsapp = el('openWhatsapp');
+  const copyMsg = el('copyMsg');
+
+  function updateFinancingAuto(){
+    const f = parseFloat(fipeInput.value) || 0;
+    const taxa = parseFloat(taxaInput.value) || 0;
+    const factor = 1 + (taxa / 100);
+    const financing = f * factor;
+    financiamentoInput.value = financing ? fmtBRL(financing) : '';
+  }
+
+  fipeInput.addEventListener('input', updateFinancingAuto);
+  taxaInput.addEventListener('input', updateFinancingAuto);
+
+  function calculateAll(){
+    const fipe = parseFloat(fipeInput.value);
+    const taxa = parseFloat(taxaInput.value);
+    const marca = marcaInput.value.trim() || '-';
+    const modelo = modeloInput.value.trim() || '-';
+    const ano = anoInput.value.trim() || '-';
+    const km = kmInput.value.trim() || '-';
+    if (!fipe || isNaN(fipe) || !taxa || isNaN(taxa)){
+      alert('Preencha corretamente o valor FIPE e a taxa.');
+      return;
     }
 
-    // Cálculo das opções
-    let op2 = fipe * (1 + taxa * 1); // 2 anos
-    let op3 = fipe * (1 + taxa * 2); // 3 anos
-    let op4 = fipe * (1 + taxa * 3); // 4 anos
+    summaryTitle.textContent = `${marca} - ${modelo} - ${ano}`;
+    summaryFipe.textContent = fmtBRL(fipe);
+    optionsContainer.innerHTML = '';
 
-    // Se usar opção única
-    let valorFinal = usarAnos ? op2 : fipe * (1 + taxa);
+    const porAno = porAnoCheckbox.checked;
 
-    document.getElementById("financiamento").value = valorFinal.toFixed(2);
+    const opts = [
+      { label: 'Opção 01 - 2 Anos', years: 2, months: 24, multiplier: porAno ? 1 : 1 },
+      { label: 'Opção 02 - 3 Anos', years: 3, months: 36, multiplier: porAno ? 2 : 1 },
+      { label: 'Opção 03 - 4 Anos', years: 4, months: 48, multiplier: porAno ? 3 : 1 }
+    ];
 
-    // Guardar global
-    window.op2 = op2;
-    window.op3 = op3;
-    window.op4 = op4;
-}
+    const results = opts.map(o => {
+      const taxFraction = (taxa / 100) * o.multiplier;
+      const total = fipe * (1 + taxFraction);
+      const mensal = total / o.months;
+      const semanal = total / (o.years * 52);
+      return { ...o, taxFraction, total, mensal, semanal };
+    });
 
-function enviarWhats() {
-    let numero = document.getElementById("whats").value;
-    let marca = document.getElementById("marca").value;
-    let modelo = document.getElementById("modelo").value;
-    let ano = document.getElementById("ano").value;
+    financiamentoInput.value = fmtBRL(fipe * (1 + (taxa / 100)));
 
-    if (!numero) {
-        alert("Insira o número do WhatsApp.");
-        return;
+    appliedNote.textContent = porAno
+      ? 'Taxa aplicada por ano (2 anos = 1x; 3 anos = 2x; 4 anos = 3x).'
+      : 'Taxa aplicada uma única vez.';
+
+    results.forEach(r => {
+      const card = document.createElement('div');
+      card.className = 'result-card';
+      card.innerHTML = `
+        <div style="max-width:72%">
+          <small>${r.label}</small>
+          <div style="font-weight:700; margin-top:6px">${fmtBRL(r.total)}
+          <span style="font-weight:500; color:var(--muted); font-size:12px">
+            (Taxa aplicada: ${(r.taxFraction*100).toFixed(2)}%)
+          </span></div>
+          <div style="color:var(--muted); font-size:13px; margin-top:6px">
+            Tempo: ${r.months} meses — ${r.years} anos
+          </div>
+        </div>
+        <div style="text-align:right">
+          <small>Pagamento mensal</small>
+          <div class="big">${fmtBRL(r.mensal)}</div>
+          <small style="display:block; margin-top:8px">Pagamento semanal</small>
+          <div class="big">${fmtBRL(r.semanal)}</div>
+        </div>
+      `;
+      optionsContainer.appendChild(card);
+    });
+
+    let message = `${marca} - ${modelo} - ${ano}\n\nSimulação:\n\n`;
+    results.forEach((r, idx) => {
+      message += `Opção ${idx+1} - ${r.years} anos:\n`;
+      message += `Mensal: ${fmtBRL(r.mensal)}\n`;
+      message += `Semanal: ${fmtBRL(r.semanal)}\n\n`;
+    });
+    whatsappMessage.value = message;
+  }
+
+  calcularBtn.addEventListener('click', calculateAll);
+
+  limparBtn.addEventListener('click', () => {
+    document.getElementById('simForm').reset();
+    financiamentoInput.value = '';
+    summaryTitle.textContent = '—';
+    summaryFipe.textContent = fmtBRL(0);
+    appliedNote.textContent = 'Nenhuma simulação realizada ainda.';
+    optionsContainer.innerHTML = '';
+    whatsappMessage.value = '';
+  });
+
+  openWhatsapp.addEventListener('click', () => {
+    const rawNum = whatsappNumber.value.trim();
+    let digits = rawNum.replace(/\D/g,'');
+    if (!digits){
+      alert('Digite o número do WhatsApp.');
+      return;
     }
+    if (digits.length <= 11) digits = '55' + digits;
+    const text = encodeURIComponent(whatsappMessage.value || '');
+    const url = `https://wa.me/${digits}?text=${text}`;
+    window.open(url, '_blank');
+  });
 
-    let msg = 
-`Conforme solicitado, preparei a simulação com todas as opções de prazo.
+  copyMsg.addEventListener('click', () => {
+    const txt = whatsappMessage.value;
+    if (!txt) { alert('Nenhuma mensagem para copiar.'); return; }
+    navigator.clipboard.writeText(txt).then(() => {
+      alert('Mensagem copiada.');
+    });
+  });
 
-${marca} - ${modelo} - ${ano}
+  const inputs = [fipeInput, taxaInput, marcaInput, modeloInput, anoInput];
+  inputs.forEach(i => i.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      calculateAll();
+    }
+  }));
 
-Opção 01 - 2 Anos:
-Tempo: 24 meses
-Valor mensal: R$ ${(window.op2 / 24).toFixed(2)}
-Valor semanal: R$ ${(window.op2 / (2 * 52)).toFixed(2)}
-
-Opção 02 - 3 Anos:
-Tempo: 36 meses
-Valor mensal: R$ ${(window.op3 / 36).toFixed(2)}
-Valor semanal: R$ ${(window.op3 / (3 * 52)).toFixed(2)}
-
-Opção 03 - 4 Anos:
-Tempo: 48 meses
-Valor mensal: R$ ${(window.op4 / 48).toFixed(2)}
-Valor semanal: R$ ${(window.op4 / (4 * 52)).toFixed(2)}
-`;
-
-    let url = "https://wa.me/55" + numero + "?text=" + encodeURIComponent(msg);
-    window.open(url, "_blank");
-}
+  updateFinancingAuto();
 </script>
-
 </body>
 </html>
