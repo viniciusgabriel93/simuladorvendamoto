@@ -236,8 +236,8 @@
       <div id="optionsContainer"></div>
 
       <div style="margin-top:8px">
-        <label for="whatsappNumber">Número do WhatsApp (com DDI)</label>
-        <input id="whatsappNumber" type="text" placeholder="Ex.: 5511999998888" 
+        <label for="whatsappNumber">Número do WhatsApp (opcional)</label>
+        <input id="whatsappNumber" type="text" placeholder="(Deixe vazio para escolher o contato)"
                inputmode="numeric" pattern="[0-9]*">
 
         <label style="margin-top:8px">Mensagem (pré-visualização)</label>
@@ -374,16 +374,23 @@
     whatsappMessage.value = '';
   });
 
+  // ✅ ALTERAÇÃO: WhatsApp sem número obrigatório
   openWhatsapp.addEventListener('click', () => {
-    const rawNum = whatsappNumber.value.trim();
-    let digits = rawNum.replace(/\D/g,'');
-    if (!digits){
-      alert('Digite o número do WhatsApp.');
-      return;
-    }
-    if (digits.length <= 11) digits = '55' + digits;
     const text = encodeURIComponent(whatsappMessage.value || '');
-    const url = `https://wa.me/${digits}?text=${text}`;
+
+    // Se usuário digitou número, envia para ele
+    let digits = whatsappNumber.value.replace(/\D/g, '');
+
+    let url = "";
+
+    if (digits.length > 0) {
+      if (digits.length <= 11) digits = '55' + digits;
+      url = `https://wa.me/${digits}?text=${text}`;
+    } else {
+      // Sem número → usuário escolhe o contato no WhatsApp
+      url = `https://wa.me/?text=${text}`;
+    }
+
     window.open(url, '_blank');
   });
 
