@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Calculadora de Venda de Motos — Exclusive</title>
+<style>
+  :root{
+    --bg:#0e0f11;
+    --card:#121315;
+    --muted:#9aa0a6;
+    --accent:#f08c00; /* laranja similar à logo */
+    --accent-2:#ffb04d;
+    --white:#ffffff;
+    --glass: rgba(255,255,255,0.03);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:linear-gradient(180deg, #0b0c0d 0%, #0f1112 100%);
+    color:var(--white);
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px;
+  }
+
+  .wrap{
+    width:100%;
+    max-width:1100px;
+    display:grid;
+    grid-template-columns: 420px 1fr;
+    gap:22px;
+  }
+
+  .panel{
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:16px;
+    padding:20px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+    border:1px solid rgba(255,255,255,0.03);
+  }
+
+  .brand{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    margin-bottom:10px;
+  }
+  .brand img{ width:64px; height:64px; object-fit:contain; border-radius:8px; background:transparent; }
+  .brand h1{ font-size:20px; margin:0; letter-spacing:0.6px;}
+  .brand p{ margin:0; color:var(--muted); font-size:12px }
+
+  label{ display:block; font-size:13px; margin-bottom:6px; color:var(--muted) }
+  input[type="text"], input[type="number"], select {
+    width:100%;
+    padding:10px 12px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,0.04);
+    background:var(--glass);
+    color:var(--white);
+    outline:none;
+    font-size:14px;
+    margin-bottom:12px;
+  }
+  .row{ display:flex; gap:12px; }
+  .col{ flex:1 }
+  .small{ width:120px }
+  .checkbox{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:13px;
+    margin-bottom:12px;
+  }
+
+  .muted{ color:var(--muted); font-size:13px }
+
+  .actions{
+    display:flex;
+    gap:10px;
+    margin-top:6px;
+  }
+
+  button{
+    cursor:pointer;
+    border:0;
+    padding:10px 14px;
+    border-radius:10px;
+    font-weight:600;
+    font-size:14px;
+  }
+  .btn-primary{
+    background: linear-gradient(90deg,var(--accent),var(--accent-2));
+    color:#111;
+    box-shadow: 0 6px 18px rgba(240,140,0,0.15);
+  }
+  .btn-ghost{
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.04);
+    color:var(--white);
+  }
+
+  /* results */
+  .results{
+    padding:18px;
+    border-radius:12px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.02));
+    border:1px solid rgba(255,255,255,0.03);
+  }
+  .results h2{ margin:0 0 8px 0; font-size:18px }
+  .result-card{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    justify-content:space-between;
+    padding:12px;
+    border-radius:10px;
+    background: rgba(0,0,0,0.25);
+    margin-bottom:10px;
+  }
+  .result-card small{ color:var(--muted) }
+  .big{ font-size:18px; font-weight:700 }
+
+  .whatsapp{
+    margin-top:12px;
+    display:flex;
+    gap:8px;
+    align-items:center;
+  }
+
+  textarea{
+    width:100%;
+    min-height:120px;
+    padding:10px;
+    border-radius:8px;
+    border:1px solid rgba(255,255,255,0.04);
+    background:transparent;
+    color:var(--white);
+    resize:vertical;
+  }
+
+  .footer-note{ color:var(--muted); font-size:12px; margin-top:8px }
+
+  /* responsive */
+  @media (max-width:980px){
+    .wrap{ grid-template-columns: 1fr; }
+    .brand img{ width:56px; height:56px }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+
+    <!-- LEFT: Form -->
+    <div class="panel">
+      <div class="brand">
+        <img src="LOGO.PNG" alt="Logo">
+        <div>
+          <h1>Exclusive — Simulador de Venda</h1>
+          <p>Aluguel / Venda — calcule opções de parcelamento</p>
+        </div>
+      </div>
+
+      <form id="simForm" onsubmit="return false;">
+        <label for="fipe">Valor da moto (tabela FIPE)</label>
+        <input id="fipe" type="number" min="0" step="0.01" placeholder="Ex.: 10000" required>
+
+        <div class="row">
+          <div class="col">
+            <label for="marca">Marca</label>
+            <input id="marca" type="text" placeholder="Ex.: Honda" required>
+          </div>
+          <div class="col">
+            <label for="modelo">Modelo</label>
+            <input id="modelo" type="text" placeholder="Ex.: CB 500" required>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label for="ano">Ano</label>
+            <input id="ano" type="text" placeholder="Ex.: 2018" required>
+          </div>
+          <div class="col">
+            <label for="km">Quilometragem (km)</label>
+            <input id="km" type="text" placeholder="Ex.: 45000">
+          </div>
+        </div>
+
+        <label for="taxa">Taxa (juros) — informe apenas o número (ex.: 100 = 100%)</label>
+        <input id="taxa" type="number" min="0" step="0.01" placeholder="Ex.: 10 ou 100" required>
+
+        <div class="checkbox">
+          <input id="porAno" type="checkbox">
+          <label for="porAno" style="margin:0">Aplicar taxa <strong>por ano</strong> (se marcado, 2 anos = 1x taxa; 3 anos = 2x taxa; 4 anos = 3x taxa)</label>
+        </div>
+
+        <label for="financiamento">Valor do financiamento (preenchido automaticamente)</label>
+        <input id="financiamento" type="text" readonly placeholder="Preencha FIPE e taxa para calcular">
+
+        <div class="actions">
+          <button id="calcularBtn" class="btn-primary" type="button">Calcular</button>
+          <button id="limparBtn" class="btn-ghost" type="button">Limpar</button>
+        </div>
+
+        <p class="footer-note">Observação: a taxa deve ser informada como número. Ex.: 100 = 100% (1.0).</p>
+      </form>
+    </div>
+
+    <!-- RIGHT: Results + WhatsApp -->
+    <div class="panel results">
+      <h2>Resultado da Simulação</h2>
+
+      <div id="summaryArea" style="margin-bottom:12px">
+        <div class="result-card">
+          <div>
+            <small>Marca / Modelo / Ano</small>
+            <div id="summaryTitle" class="big">—</div>
+          </div>
+          <div style="text-align:right">
+            <small>Valor FIPE</small>
+            <div id="summaryFipe" class="big">R$ 0,00</div>
+          </div>
+        </div>
+        <div class="muted" id="appliedNote">Nenhuma simulação realizada ainda.</div>
+      </div>
+
+      <div id="optionsContainer">
+        <!-- Option cards (2,3,4 anos) will be injected here -->
+      </div>
+
+      <div style="margin-top:8px">
+        <label for="whatsappNumber">Número do WhatsApp (com DDI) — se não informar DDI, o sistema assume Brasil +55</label>
+        <input id="whatsappNumber" type="text" placeholder="Ex.: 5511999998888 ou 11999998888">
+
+        <label style="margin-top:8px">Mensagem (pré-visualização)</label>
+        <textarea id="whatsappMessage" readonly></textarea>
+
+        <div class="whatsapp">
+          <button id="openWhatsapp" class="btn-primary">Abrir no WhatsApp</button>
+          <button id="copyMsg" class="btn-ghost">Copiar Mensagem</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+<script>
+  // Utils
+  const fmtBRL = v => {
+    if (isNaN(v) || v === null) v = 0;
+    return new Intl.NumberFormat('pt-BR', { style:'currency', currency:'BRL' }).format(v);
+  };
+
+  const el = id => document.getElementById(id);
+
+  // Elements
+  const fipeInput = el('fipe');
+  const taxaInput = el('taxa');
+  const financiamentoInput = el('financiamento');
+  const calcularBtn = el('calcularBtn');
+  const limparBtn = el('limparBtn');
+  const porAnoCheckbox = el('porAno');
+  const summaryTitle = el('summaryTitle');
+  const summaryFipe = el('summaryFipe');
+  const appliedNote = el('appliedNote');
+  const optionsContainer = el('optionsContainer');
+  const marcaInput = el('marca');
+  const modeloInput = el('modelo');
+  const anoInput = el('ano');
+  const kmInput = el('km');
+  const whatsappNumber = el('whatsappNumber');
+  const whatsappMessage = el('whatsappMessage');
+  const openWhatsapp = el('openWhatsapp');
+  const copyMsg = el('copyMsg');
+
+  // Auto-fill financing when fipe and taxa change (single application)
+  function updateFinancingAuto(){
+    const f = parseFloat(fipeInput.value) || 0;
+    const taxa = parseFloat(taxaInput.value) || 0;
+    // taxa is given as percentage number (100 => 100%)
+    const factor = 1 + (taxa / 100);
+    const financing = f * factor;
+    financiamentoInput.value = financing ? fmtBRL(financing) : '';
+  }
+
+  fipeInput.addEventListener('input', updateFinancingAuto);
+  taxaInput.addEventListener('input', updateFinancingAuto);
+
+  // Calculation logic per user rules
+  function calculateAll(){
+    const fipe = parseFloat(fipeInput.value);
+    const taxa = parseFloat(taxaInput.value);
+    const marca = marcaInput.value.trim() || '-';
+    const modelo = modeloInput.value.trim() || '-';
+    const ano = anoInput.value.trim() || '-';
+    const km = kmInput.value.trim() || '-';
+    if (!fipe || isNaN(fipe) || !taxa || isNaN(taxa)){
+      alert('Preencha corretamente o valor FIPE e a taxa (ex.: 100 = 100%).');
+      return;
+    }
+
+    // show header
+    summaryTitle.textContent = `${marca} - ${modelo} - ${ano}`;
+    summaryFipe.textContent = fmtBRL(fipe);
+
+    // Clear previous cards
+    optionsContainer.innerHTML = '';
+
+    // per user: when not "por ano" checked -> tax applied once (same total for 2/3/4 anos)
+    // when "por ano" checked -> 2 years: apply taxa 1x; 3 years: taxa 2x; 4 years: taxa 3x.
+    const porAno = porAnoCheckbox.checked;
+
+    // define options
+    const opts = [
+      { label: 'Opção 01 - 2 Anos', years: 2, months: 24, multiplier: porAno ? 1 : 1 },
+      { label: 'Opção 02 - 3 Anos', years: 3, months: 36, multiplier: porAno ? 2 : 1 },
+      { label: 'Opção 03 - 4 Anos', years: 4, months: 48, multiplier: porAno ? 3 : 1 }
+    ];
+
+    // compute for each option
+    const results = opts.map(o => {
+      const taxFraction = (taxa / 100) * o.multiplier; // simple application per your spec
+      const total = fipe * (1 + taxFraction);
+      const mensal = total / o.months;
+      const semanal = total / (o.years * 52); // option B: divide by years*52
+      return {
+        ...o,
+        taxFraction,
+        total,
+        mensal,
+        semanal
+      };
+    });
+
+    // fill financing field with single-application financing (FIPE * (1 + taxa/100))
+    const financingSingle = fipe * (1 + (taxa / 100));
+    financiamentoInput.value = fmtBRL(financingSingle);
+
+    // update note
+    appliedNote.textContent = porAno
+      ? 'Taxa aplicada por ano (simples): 2 anos = 1x taxa, 3 anos = 2x taxa, 4 anos = 3x taxa.'
+      : 'Taxa aplicada uma única vez ao valor total (não por ano).';
+
+    // render cards
+    results.forEach(r => {
+      const card = document.createElement('div');
+      card.className = 'result-card';
+      card.innerHTML = `
+        <div style="max-width:72%">
+          <small>${r.label}</small>
+          <div style="font-weight:700; margin-top:6px">${fmtBRL(r.total)} <span style="font-weight:500; color:var(--muted); font-size:12px"> (Taxa aplicada: ${(r.taxFraction*100).toFixed(2)}%)</span></div>
+          <div style="color:var(--muted); font-size:13px; margin-top:6px">Tempo: ${r.months} meses — ${r.years} anos</div>
+        </div>
+        <div style="text-align:right">
+          <small>Pagamento mensal</small>
+          <div class="big">${fmtBRL(r.mensal)}</div>
+          <small style="display:block; margin-top:8px">Pagamento semanal</small>
+          <div class="big">${fmtBRL(r.semanal)}</div>
+        </div>
+      `;
+      optionsContainer.appendChild(card);
+    });
+
+    // prepare WhatsApp message
+    const initialText = "Conforme solicitado, preparei a simulação com todas as opções de prazo:";
+    let message = `${marca} - ${modelo} - ${ano}\n\n${initialText}\n\n`;
+    results.forEach((r, idx) => {
+      message += `Opção ${String(idx+1).padStart(2,'0')} - ${r.years} Ano${r.years>1?'s':''}:\n`;
+      message += `Tempo: ${r.months} meses\n`;
+      message += `Valor para pagamento mensal: ${fmtBRL(r.mensal)}\n`;
+      message += `Valor para pagamento semanal: ${fmtBRL(r.semanal)}\n\n`;
+    });
+    whatsappMessage.value = message;
+  }
+
+  // Event listeners
+  calcularBtn.addEventListener('click', calculateAll);
+
+  limparBtn.addEventListener('click', () => {
+    document.getElementById('simForm').reset();
+    financiamentoInput.value = '';
+    summaryTitle.textContent = '—';
+    summaryFipe.textContent = fmtBRL(0);
+    appliedNote.textContent = 'Nenhuma simulação realizada ainda.';
+    optionsContainer.innerHTML = '';
+    whatsappMessage.value = '';
+  });
+
+  // Open WhatsApp with chosen number and message
+  openWhatsapp.addEventListener('click', () => {
+    const rawNum = whatsappNumber.value.trim();
+    let digits = rawNum.replace(/\D/g,'');
+    if (!digits){
+      alert('Digite o número do WhatsApp para o qual deseja enviar (com DDI ou o número local).');
+      return;
+    }
+    // If number looks local (<=11 digits) assume Brazil +55
+    if (digits.length <= 11) digits = '55' + digits;
+    // Encode message
+    const text = encodeURIComponent(whatsappMessage.value || '');
+    const url = `https://wa.me/${digits}?text=${text}`;
+    window.open(url, '_blank');
+  });
+
+  // Copy message
+  copyMsg.addEventListener('click', () => {
+    const txt = whatsappMessage.value;
+    if (!txt) { alert('Nenhuma mensagem para copiar. Faça a simulação primeiro.'); return; }
+    navigator.clipboard.writeText(txt).then(() => {
+      alert('Mensagem copiada para a área de transferência.');
+    }).catch(()=>alert('Não foi possível copiar automaticamente. Seleciona e copie manualmente.'));
+  });
+
+  // Small UX: pressing Enter in fields triggers calculate
+  const inputs = [fipeInput, taxaInput, marcaInput, modeloInput, anoInput];
+  inputs.forEach(i => i.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      calculateAll();
+    }
+  }));
+
+  // initialize
+  updateFinancingAuto();
+</script>
+</body>
+</html>
