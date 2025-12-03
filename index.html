@@ -282,9 +282,10 @@
 
   function updateFinancingAuto(){
     const f = parseFloat(fipeInput.value) || 0;
-    const taxa = parseFloat(taxaInput.value) || 0;
-    const factor = 1 + (taxa / 100);
-    const financing = f * factor;
+    const taxa = parseFloat(taxaInput.value);
+    // show financing based only on the typed taxa (single application)
+    const taxaDecimal = isNaN(taxa) ? 0 : (taxa / 100);
+    const financing = f * (1 + taxaDecimal);
     financiamentoInput.value = financing ? fmtBRL(financing) : '';
   }
 
@@ -298,10 +299,15 @@
     const modelo = modeloInput.value.trim() || '-';
     const ano = anoInput.value.trim() || '-';
     const km = kmInput.value.trim() || '-';
-    if (!fipe || isNaN(fipe) || !taxa || isNaN(taxa)){
-      alert('Preencha corretamente o valor FIPE e a taxa.');
+
+    // Validate required fields: FIPE, marca, modelo, ano
+    if (!fipe || isNaN(fipe) || !marca || !modelo || !ano) {
+      alert('Preencha corretamente o valor FIPE, marca, modelo e ano.');
       return;
     }
+
+    // taxa can be zero; handle gracefully
+    const taxaDigitada = isNaN(taxa) ? 0 : (taxa / 100);
 
     summaryTitle.textContent = `${marca} - ${modelo} - ${ano}`;
     summaryFipe.textContent = fmtBRL(fipe);
@@ -309,26 +315,33 @@
 
     const porAno = porAnoCheckbox.checked;
 
+    // JUROS AUTOMÁTICOS PROGRESSIVOS (fixo)
+    // 2 anos = 100% (1.00)
+    // 3 anos = 150% (1.50)
+    // 4 anos = 200% (2.00)
     const opts = [
-      { label: 'Opção 01 - 2 Anos', years: 2, months: 24, multiplier: porAno ? 1 : 1 },
-      { label: 'Opção 02 - 3 Anos', years: 3, months: 36, multiplier: porAno ? 2 : 1 },
-      { label: 'Opção 03 - 4 Anos', years: 4, months: 48, multiplier: porAno ? 3 : 1 }
+      { label: 'Opção 01 - 2 Anos', years: 2, months: 24, jurosBase: 1.00 },
+      { label: 'Opção 02 - 3 Anos', years: 3, months: 36, jurosBase: 1.50 },
+      { label: 'Opção 03 - 4 Anos', years: 4, months: 48, jurosBase: 2.00 }
     ];
 
     const results = opts.map(o => {
-      const taxFraction = (taxa / 100) * o.multiplier;
+      // se "por ano" marcado, multiplicar taxa digitada por (anos - 1) -> 2anos=1x, 3anos=2x, 4anos=3x
+      const adicional = porAno ? taxaDigitada * (o.years - 1) : taxaDigitada;
+      const taxFraction = o.jurosBase + adicional; // total em decimal (1.00 = 100%)
       const total = fipe * (1 + taxFraction);
       const mensal = total / o.months;
       const semanal = total / (o.years * 52);
       return { ...o, taxFraction, total, mensal, semanal };
     });
 
-    financiamentoInput.value = fmtBRL(fipe * (1 + (taxa / 100)));
+    // atualizar campo financiamento (comportamento simples — usa taxa digitada)
+    financiamentoInput.value = fmtBRL(fipe * (1 + taxaDigitada));
 
-    appliedNote.textContent = porAno
-      ? 'Taxa aplicada por ano (2 anos = 1x; 3 anos = 2x; 4 anos = 3x).'
-      : 'Taxa aplicada uma única vez.';
+    appliedNote.textContent =
+      'Juros progressivo aplicado: 2 anos = 100%, 3 anos = 150%, 4 anos = 200% da taxa base + taxa informada.';
 
+    // render cards (mesmo layout)
     results.forEach(r => {
       const card = document.createElement('div');
       card.className = 'result-card';
@@ -353,12 +366,17 @@
       optionsContainer.appendChild(card);
     });
 
-    let message = `${marca} - ${modelo} - ${ano}\n\nSimulação:\n\n`;
+    // preparar mensagem no formato que você pediu
+    const intro = "Conforme solicitado, segue a simulação:";
+    let message = `${marca} - ${modelo} - ${ano}\n\n${intro}\n\n`;
     results.forEach((r, idx) => {
-      message += `Opção ${idx+1} - ${r.years} anos:\n`;
-      message += `Mensal: ${fmtBRL(r.mensal)}\n`;
-      message += `Semanal: ${fmtBRL(r.semanal)}\n\n`;
+      const optionLabel = `Opção ${String(idx+1).padStart(2,'0')} - ${r.years} Ano${r.years>1?'s':''}:`;
+      message += `${optionLabel}\n`;
+      message += `Tempo: ${r.months} meses\n`;
+      message += `Valor para pagamento mensal: ${fmtBRL(r.mensal)}\n`;
+      message += `Valor para pagamento semanal: ${fmtBRL(r.semanal)}\n\n`;
     });
+
     whatsappMessage.value = message;
   }
 
